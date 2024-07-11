@@ -1,0 +1,42 @@
+#  == File: loki-server.yml
+#
+# Install & Configure Loki Server
+#
+#  == Copyright
+#     All Rights Reserved
+#
+# --------------------------------------------------------------------------
+# WARNING: This file belongs to the Core framework. Avoid any local changes
+# --------------------------------------------------------------------------
+#
+# This file is Managed by ANSIBLE
+# --------------------------------------------------------------------------
+
+
+    # create a loki directory if it doesn't exist
+    - file:
+        path: /usr/src/loki
+        state: directory
+        mode: 0755
+        owner: root
+        group: root
+
+    - name: Execute the script
+      command: cd /usr/src/loki
+
+    - name: "Copy Loki Setup Bash File"
+      copy:
+        src:  "{{ansible_roles_path}}/files/loki/install_loki_server.sh"
+        dest: /usr/src/loki/
+        owner: root
+        group: root
+        mode: '755'
+
+    - name: Execute the bash script
+      command: sudo sh /usr/src/loki/install_loki_server.sh > /dev/null
+
+    - name: Start and Enable Loki Service
+      systemd:
+        name: loki
+        state: restarted
+        enabled: yes
